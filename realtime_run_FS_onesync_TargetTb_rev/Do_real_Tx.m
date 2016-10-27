@@ -55,7 +55,7 @@ while (1) %repeat send
     end
 
     fc = p.fc;
-    Tb = 96;
+    Tb = p.Tb;
     %% Generate Tx signal
     fname_txt = [fname,'.txt'];
     fname_snd = [fname];

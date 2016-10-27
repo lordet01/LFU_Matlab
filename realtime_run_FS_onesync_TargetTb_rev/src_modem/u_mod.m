@@ -73,7 +73,7 @@ while (1)
         %Add data
         if sync_off == 0
             d = double(content);
-            b_char = de2bi(d, 7);
+            b_char = de2bi(d, 7,'left-msb');
 
             cnt = 0;
             for k = 1:7

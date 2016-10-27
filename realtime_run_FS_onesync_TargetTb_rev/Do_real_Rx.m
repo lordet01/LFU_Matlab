@@ -35,10 +35,11 @@ snd_list = dir(snd_path);
 snd_list = snd_list(3:end);
 
 
-Tb_target = 96;
+Tb_target = p.Tb;
 for i = 1:length(Tb_target)
     %Decode Rx signal
-    fname_wav_rcv = 'src_modem/rcv_sim_fs1/URL_out.wav';
+%     fname_wav_rcv = 'src_modem/rcv_sim_fs1/URL_out.wav';
+    fname_wav_rcv = 'src_modem/snd/menu_Tb192_Fc20000.wav';
     [~,fname_rcv] = strtok(fname_wav_rcv, '/');
     [~,fname_rcv] = strtok(fname_rcv, '/');
     [fname_rcv,~] = strtok(fname_rcv, '/');

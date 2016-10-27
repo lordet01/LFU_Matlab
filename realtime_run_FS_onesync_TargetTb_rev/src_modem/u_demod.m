@@ -31,7 +31,6 @@ s_prv = zeros(1, Tb);
 n_avg = 0;
 
 s_BPF_tail_prv_1 = zeros(1, length(BPF)-1);
-% s_BPF_tail_prv_2 = zeros(1, length(BPF)-1);
 header_flag = 0;
 err_cnt_char = 0;
 bit_cnt = 0;
@@ -40,7 +39,6 @@ fin = fopen(fname_rcv, 'rb');
 fout = fopen(fname_txt, 'wt');
 fbit = fopen(bit_name_txt, 'wt');
 fprintf(fbit, '\n');
-% fbit_bc = fopen(['src_modem/bit/bit_bc_rcv.txt'], 'wt');
 
 if p.DEBUG
     fdebug1 = fopen('src_modem/snd/rcv.pcm', 'ab');
@@ -147,15 +145,9 @@ while (1)
 % %     S_proc = [0, S, flipud(S(1:end-1)')'];
 % %     s = real(ifft(S_proc, Tb));
 
-
+%     disp([s(6), s(11), s_prv(6), s_prv(11)]);
     bit = bit_detect(s_prv, s);
-    
-%     if bit == 1
-%         fprintf(fbit, '%c', '1');
-%     else
-%         fprintf(fbit, '%c', '0');
-%     end
-    
+
     %Stack bits
     bit_buff(1:M*G-1) = bit_buff(2:M*G);
     bit_buff(M*G) = bit;
@@ -176,6 +168,7 @@ while (1)
         
         
         if BC_GOLAY
+            %[23, 12] Golay decoding
             bit_blk_c = golaycodec(bit_blk_bc);
         else
             bit_blk_c = bit_blk_bc;
@@ -187,7 +180,7 @@ while (1)
             bit_write(bit_blk, fbit);
             for k = 1 : N
                 if mod(sum(bit_blk(k,:)),2)==0;
-                    c = char(bi2de(bit_blk(k,1:7)));
+                    c = char(bi2de(bit_blk(k,1:7),'left-msb'));
                     %                     fprintf(fout, '%c', c);
                     c_idx = c_idx + 1;
                     c_buff(c_idx) = c;
@@ -241,7 +234,6 @@ while (1)
                         end
                     end
                 else
-                    %                         disp('error detected!');
                     err_cnt_char = err_cnt_char + 1;
                 end
             end
@@ -271,13 +263,13 @@ while (1)
             end
         end
     end
+%     disp([bi2de(bit_blk(1,:),'left-msb'),bi2de(bit_blk(2,:),'left-msb'),bi2de(bit_blk(3,:),'left-msb')]);
+    
     
     s_prv = s;
     if p.dec_BPF
         s_BPF_tail_prv_1 = s_BPF_tail_1;
-%         if p.dec_PowScale
-%             s_BPF_tail_prv_2 = s_BPF_tail_2;
-%         end
+
     end
     
     if nFrmIdx <= p.init_frame
