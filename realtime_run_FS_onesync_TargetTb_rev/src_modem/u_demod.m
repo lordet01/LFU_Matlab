@@ -3,6 +3,16 @@ function u_demod(fname_rcv, fname_txt, bit_name_txt, Tb, p)
 addpath('src_modem/src');
 load('src/BPF_19500_20500.mat');
 
+%load golay code libary from C
+addpath('src_modem/lib');
+if not(libisloaded('golay_lib'))
+    loadlibrary('golay_lib.dll','golay.h')
+end
+%libfunctions('golay_lib')
+
+%calllib('golay_lib', 'decode_golay', 53);
+
+
 MIC_ON = p.MIC_ON;
 INTERLEAVE = p.INTERLEAVE;
 BC_GOLAY = p.BC_GOLAY;
@@ -26,6 +36,7 @@ end
 header_bits = [1 1 1 0 0 1 1 0];
 ender_bits = [1 1 1 1 1 1 1 0];
 bit_buff = zeros(1, M*G);
+bit_blk_c = zeros(M, C);
 
 s_prv = zeros(1, Tb);
 n_avg = 0;
@@ -167,9 +178,18 @@ while (1)
         end
         
         
-        if BC_GOLAY
+        if BC_GOLAY == 1
             %[23, 12] Golay decoding
-            bit_blk_c = golaycodec(bit_blk_bc);
+            bit_blk_c(1,:) = golaycodec(bit_blk_bc(1,:));
+            bit_blk_c(2,:) = golaycodec(bit_blk_bc(2,:));
+        elseif BC_GOLAY == 2
+           deci_tmp1 = bi2de(bit_blk_bc(1,:), 'left-msb'); 
+           deci_tmp2 = bi2de(bit_blk_bc(2,:), 'left-msb');
+           deci_out1 = calllib('golay_lib', 'decode_golay', deci_tmp1);     
+           deci_out2 = calllib('golay_lib', 'decode_golay', deci_tmp2);     
+           
+           bit_blk_c(1,:) = de2bi(deci_out1,C,'left-msb');
+           bit_blk_c(2,:) = de2bi(deci_out2,C,'left-msb');
         else
             bit_blk_c = bit_blk_bc;
         end
@@ -277,5 +297,6 @@ while (1)
     end
 end
 fclose('all');
+unloadlibrary('golay_lib');
 
 end

@@ -1,13 +1,13 @@
 global p;
 
 %Codec settings
-p.BC_GOLAY = 1;
+p.BC_GOLAY = 2; %0 = off, 1 = Matlab golay, 2 = C_DLL Golay 
 p.enc_BPF = 1;
 p.dec_BPF = 1;
 p.dec_PowScale = 0;
 p.INTERLEAVE = 0;
-p.PLAY_PACKETWISE = 1;
-p.MIC_ON = 1;
+p.PLAY_PACKETWISE = 0;
+p.MIC_ON = 0;
 p.URL_Mode = 2; %1: Web, 2: Menu, Card
 p.LOCALE = 'eng'; %Locale codes
 % Tb = 120;

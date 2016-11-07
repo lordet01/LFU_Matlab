@@ -4,6 +4,15 @@ addpath('src_modem/src');
 % load('src/HPF.mat');
 load('src/BPF_19500_20500.mat');
 
+%load golay code libary from C
+addpath('src_modem/lib');
+if not(libisloaded('golay_lib'))
+    loadlibrary('golay_lib.dll','golay.h')
+end
+%libfunctions('golay_lib')
+
+%calllib('golay_lib', 'decode_golay', 53);
+
 BC_GOLAY = p.BC_GOLAY;
 INTERLEAVE = p.INTERLEAVE;
 PLAY_PACKETWISE = p.PLAY_PACKETWISE;
@@ -20,7 +29,13 @@ M = 2; %2 x 12 bit
 N = 3; %3 x 8 bit
 B = 8; %Unit symbol length
 C = 12; %Unit code length
+if BC_GOLAY > 0
+    G = 23; %Golay bit length
+else
+    G = C;
+end
 bit_blk = zeros(N,B);
+bit_blk_bc = zeros(M,G);
 blk_cnt = 0;
 sync_on = 0;  %Header flag
 sync_off = 0;
@@ -100,8 +115,17 @@ while (1)
         bit_write(bit_blk, fbit);
         bit_blk_c = matB2C(bit_blk, M, C);
 
-        if BC_GOLAY
-            bit_blk_bc = golaycodec(bit_blk_c);
+        if BC_GOLAY == 1
+            bit_blk_bc(1,:) = golaycodec(bit_blk_c(1,:));
+            bit_blk_bc(2,:) = golaycodec(bit_blk_c(2,:));
+        elseif BC_GOLAY == 2
+           deci_tmp1 = bi2de(bit_blk_c(1,:), 'left-msb'); 
+           deci_tmp2 = bi2de(bit_blk_c(2,:), 'left-msb');
+           deci_out1 = calllib('golay_lib', 'encode_golay', deci_tmp1);     
+           deci_out2 = calllib('golay_lib', 'encode_golay', deci_tmp2);     
+           
+           bit_blk_bc(1,:) = de2bi(deci_out1,G,'left-msb');
+           bit_blk_bc(2,:) = de2bi(deci_out2,G,'left-msb');
         else
             bit_blk_bc = bit_blk_c;
         end
@@ -206,5 +230,6 @@ pcm2wav(['src_modem/snd/',fname_snd],p);
 % wavwrite(Mix./32767, 48000, 'snd/snd_classic.wav')
 
 fclose('all');
+unloadlibrary('golay_lib');
 
 end

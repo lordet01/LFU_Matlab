@@ -28,7 +28,7 @@ initial_setting;
 
 while (1) %repeat send
     %% Cleanup outputs
-    delete('src_modem/snd/*.wav');
+    %delete('src_modem/snd/*.wav');
     delete('src_modem/preamble/*.mat');
     delete('src_modem/output/*.txt');
     delete('src_modem/output/ref/*.txt');
@@ -51,7 +51,7 @@ while (1) %repeat send
         fclose(fin_r);
         fname = 'in_rnd';
     else
-        fname = 'menu';
+        fname = 'vote1';
     end
 
     fc = p.fc;

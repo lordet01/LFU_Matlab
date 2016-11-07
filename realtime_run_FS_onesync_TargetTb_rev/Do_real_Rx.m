@@ -39,7 +39,7 @@ Tb_target = p.Tb;
 for i = 1:length(Tb_target)
     %Decode Rx signal
 %     fname_wav_rcv = 'src_modem/rcv_sim_fs1/URL_out.wav';
-    fname_wav_rcv = 'src_modem/snd/menu_Tb192_Fc20000.wav';
+    fname_wav_rcv = 'src_modem/snd/music_testTV_218_sample.wav';
     [~,fname_rcv] = strtok(fname_wav_rcv, '/');
     [~,fname_rcv] = strtok(fname_rcv, '/');
     [fname_rcv,~] = strtok(fname_rcv, '/');
