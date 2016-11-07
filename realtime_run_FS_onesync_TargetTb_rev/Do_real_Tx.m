@@ -28,7 +28,7 @@ initial_setting;
 
 while (1) %repeat send
     %% Cleanup outputs
-    %delete('src_modem/snd/*.wav');
+%     delete('src_modem/snd/*.wav');
     delete('src_modem/preamble/*.mat');
     delete('src_modem/output/*.txt');
     delete('src_modem/output/ref/*.txt');
@@ -67,7 +67,7 @@ while (1) %repeat send
                 fname_snd_full = [fname_snd,'_Tb',num2str(Tb(i)),'_Fc',num2str(fc(j))];
             end
             fexist = fopen(['src_modem/snd/',fname_snd_full,'.wav']);
-            if fexist == -1
+            if fexist == -1 || p.MIC_ON == 1
                 u_mod(fname_txt, [fname_snd_full,'.pcm'], Tb(i), fc(j), p);
             end
         end

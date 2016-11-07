@@ -2,7 +2,7 @@ function u_mod(fname_txt, fname_snd, Tb, fc, p)
 
 addpath('src_modem/src');
 % load('src/HPF.mat');
-load('src/BPF_19500_20500.mat');
+load('src/BPF_44100_19200-20200.mat');
 
 %load golay code libary from C
 addpath('src_modem/lib');
