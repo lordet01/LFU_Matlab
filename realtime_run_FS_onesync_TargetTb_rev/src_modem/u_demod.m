@@ -57,6 +57,7 @@ if p.DEBUG
     fdebug3 = fopen('src_modem/snd/rcv_Proc_Scale.pcm', 'ab');
 end
 
+
 if MIC_ON
     %Initialize Audio recording
     [obj]=dsp_record(0, Fs, 1, Tb, 'start');
@@ -201,71 +202,64 @@ while (1)
             for k = 1 : N
                 if mod(sum(bit_blk(k,:)),2)==0;
                     c = char(bi2de(bit_blk(k,1:7),'left-msb'));
-                    %                     fprintf(fout, '%c', c);
+                    fprintf('%c', c);
                     c_idx = c_idx + 1;
                     c_buff(c_idx) = c;
-                    if p.URL_Mode == 1 %Web
-                        disp(sprintf('%c', c));
-                        url_buff(url_cnt) = c;
-                        url_cnt = url_cnt + 1;
-                        if c == 10; %New line, LF
-                            URL = char(url_buff);
-%                             [~,URL]=strtok(URL,'htt');
-                            [URL,~]=strtok(URL,10);
-                            flag = strncmp(URL,'http',4);
-                            if flag == 0
-                                try
-                                    URL = ['https://',URL'];
-                                catch
-                                    URL = ['https://',URL];
-                                end
-                            end
-                            disp(URL);
-                            web(URL, '-new', '-notoolbar');
-                            url_buff = zeros(p.WORD_LEN,1);
-                            url_cnt = 1;
-                        end
-                    elseif p.URL_Mode == 2 %Menu or Card
-                        disp(sprintf('%c', c));
-                        url_buff(url_cnt) = c;
-                        url_cnt = url_cnt + 1;
-                        if c == 10; %New line, LF
-                            URL = char(url_buff);
-%                             [~,URL]=strtok(URL,'htt');
-                            [URL,~]=strtok(URL,10);
-                            URL = [URL',p.LOCALE,'.pdf'];
-                            flag = strncmp(URL,'http',4);
-                            if flag == 0
-                                try
-                                    URL = ['https://',URL'];
-                                catch
-                                    URL = ['https://',URL];
-                                end
-                            end
-                            disp(URL);
-                            
-                            [key1,~]=size(strfind(URL, 'http'));
-                            [key2,~]=size(strfind(URL, 'pdf'));
-                            if key1 == 1 && key2 == 1
-                                system(['start chrome ','"',URL,'"']);
-                            end
-                            url_buff = zeros(p.WORD_LEN,1);
-                            url_cnt = 1;
-                        end
-                    end
+                    url_buff(url_cnt) = c;
+                    url_cnt = url_cnt + 1;
                 else
                     err_cnt_char = err_cnt_char + 1;
                 end
             end
             %Finish decoding (Successful transmission)
             if isequal(ender_bits, bit_blk(3,:)) && c_idx <= p.WORD_LEN
-                fprintf(fout, '%c', c_buff(1:c_idx));
+                if p.URL_Mode == 1 %Web
+                    URL = char(url_buff);
+                    [~,URL]=strtok(URL,'@');
+                    [URL,~]=strtok(URL,10);
+                    flag = strncmp(URL,'http',4);
+                    if flag == 0
+                        try
+                            URL = ['https://',URL'];
+                        catch
+                            URL = ['https://',URL];
+                        end
+                    end
+                    fprintf('\n%s\n',URL);
+%                     web(URL, '-new', '-notoolbar');
+                    system(['start chrome ','"',URL,'"']);
+                    
+                    url_buff = zeros(p.WORD_LEN,1);
+                    url_cnt = 1;
+                elseif p.URL_Mode == 2 %Menu or Card
+                    URL = char(url_buff);
+                    [~,URL]=strtok(URL,'@');
+                    [URL,~]=strtok(URL,10);
+                    URL = [URL',p.LOCALE,'.pdf'];
+                    flag = strncmp(URL,'http',4);
+                    if flag == 0
+                        try
+                            URL = ['https://',URL'];
+                        catch
+                            URL = ['https://',URL];
+                        end
+                    end
+                    disp(['\n',URL]);
+                    
+                    [key1,~]=size(strfind(URL, 'http'));
+                    [key2,~]=size(strfind(URL, 'pdf'));
+                    if key1 == 1 && key2 == 1
+                        system(['start chrome ','"',URL,'"']);
+                    end
+                    url_buff = zeros(p.WORD_LEN,1);
+                    url_cnt = 1;
+                end
+                
                 header_flag = 0;
                 c_idx = 1;
                 fprintf(fout, '\n');
                 
                 fprintf(fbit, '\n');
-                %             break;
             end
             
             %Finish decoding (Force termination)
@@ -274,12 +268,14 @@ while (1)
                 header_flag = 0;
                 c_idx = 1;
                 fprintf(fout, '\n');
-                %             break;
             end
         else
             %Sync set
             if isequal(header_bits, bit_blk(1,:)) && isequal(header_bits, bit_blk(2,:))&& isequal(header_bits, bit_blk(3,:))
                 header_flag = 1;
+                    
+                %Kill & start player
+                [~, ~]= system('taskkill /F /IM chrome.exe');
             end
         end
     end

@@ -45,7 +45,19 @@ b_prev = 1;
 header_bits = [1 1 1 0 0 1 1 0];
 ender_bits = [1 1 1 1 1 1 1 0];
 frame_idx = 0;
-w = sqrt(hann(Tb, 'symmetric')); %Smoothing window
+
+%Window design
+t_h = Tb;
+ws = 1.0; % > 1 thinner, <1 : thicker
+rr = 0.9; %Rectification ratio
+t_win = floor(t_h*(1-rr));
+w_tail = hann(t_win);
+w_tail = w_tail .^ ws;
+w = ones(t_h,1);
+w(1:floor(t_win/2)) = w_tail(1:floor(t_win/2));
+w(end-floor(t_win/2)+1:end) = w_tail(1+floor(t_win/2):2*floor(t_win/2));
+
+% w = sqrt(hann(Tb, 'symmetric')); %Smoothing window
 % w = ones(Tb,1); %Bypass windows
 w = w';
 

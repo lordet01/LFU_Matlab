@@ -8,22 +8,22 @@ p.dec_PowScale = 0;
 p.INTERLEAVE = 0;
 p.PLAY_PACKETWISE = 0;
 p.MIC_ON = 1;
-p.URL_Mode = 2; %1: Web, 2: Menu, Card
+p.URL_Mode = 1; %1: Web, 2: Menu, Card
 p.LOCALE = 'eng'; %Locale codes
 % Tb = 120;
 p.fs = 44100;
-p.AMP = 15000;
+p.AMP = 20000;
 p.init_frame = 100; %Initial frames for noise update
 p.scale_thr = 1.2;
 p.fc = 19600;
-p.Tb = 810; %96 
+p.Tb = 810; %multiple of 9 
 p.Rp = 1; %Packet rate: Databit / Packetbit: 2/3
 p.Rc = 12/23; %Coding Rate: Mx12 in -> Mx23 out -> Golay coding : 12/23
 % p.Rc = 1;
 p.BPS_num = p.fs * p.Rp * p.Rc;
 
 %Decoder setting
-p.SCALE_MAX = 15000;
+p.SCALE_MAX =25000;
 p.DEBUG = 1;
 
 %%Parameters
