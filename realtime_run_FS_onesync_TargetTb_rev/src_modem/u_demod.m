@@ -213,6 +213,10 @@ while (1)
             end
             %Finish decoding (Successful transmission)
             if isequal(ender_bits, bit_blk(3,:)) && c_idx <= p.WORD_LEN
+                
+                %Kill & start player
+                [~, ~]= system('taskkill /F /IM chrome.exe');
+                
                 if p.URL_Mode == 1 %Web
                     URL = char(url_buff);
                     [~,URL]=strtok(URL,'@');
@@ -273,9 +277,6 @@ while (1)
             %Sync set
             if isequal(header_bits, bit_blk(1,:)) && isequal(header_bits, bit_blk(2,:))&& isequal(header_bits, bit_blk(3,:))
                 header_flag = 1;
-                    
-                %Kill & start player
-                [~, ~]= system('taskkill /F /IM chrome.exe');
             end
         end
     end
