@@ -1,7 +1,7 @@
 global p;
 
 %Codec settings
-p.BC_GOLAY = 2; %0 = off, 1 = Matlab golay, 2 = C_DLL Golay 
+p.BC_GOLAY = 1; %0 = off, 1 = Matlab golay, 2 = C_DLL Golay 
 p.enc_BPF = 1;
 p.dec_BPF = 1;
 p.dec_PowScale = 0;
@@ -21,6 +21,7 @@ p.Rp = 1; %Packet rate: Databit / Packetbit: 2/3
 p.Rc = 12/23; %Coding Rate: Mx12 in -> Mx23 out -> Golay coding : 12/23
 % p.Rc = 1;
 p.BPS_num = p.fs * p.Rp * p.Rc;
+p.chirp_sync = 1; %Off: sequence-based sync, On: signal-based sync
 
 %Decoder setting
 p.SCALE_MAX =25000;
@@ -39,6 +40,13 @@ p.C_scale = 40964 / p.Rc;
 p.N_guard_len = 5550;
 p.N_sync_len = 0; %power preservation region that include sync (0 : off)
 p.sil_len = 5000;
+
+p.t1 = 0.2; %Half length of the preamble 
+p.fl = 18050; %Chirp bound (low)
+p.fh = 22050; %Chirp bound (high)
+p.rr = 0.9; %Rectification ratio
+p.ws = 1.0; % > 1 thinner, <1 : thicker
+
 
 %% Attenuation model fitting
 p.WORD_LEN = 50; %Maximum length of the unit word length

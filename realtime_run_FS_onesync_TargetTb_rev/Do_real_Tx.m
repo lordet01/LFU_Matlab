@@ -16,6 +16,7 @@
 %                     - [20150915](v1.3) Revised Modem's synchronization conditions for improved 
 %                                        robustness under various delay and background noise 
 %                     - [20150923](v1.4) Added envelope detector and PN sequence based synchronization mode 
+%                     - [20170315](v2.0) Added Quadrature Chirp-based synchronization mode 
 %                                 
 % ***********************************************/
 fclose('all');
@@ -39,7 +40,7 @@ while (1) %repeat send
     
     %% Generate arbitrary input txt
     if p.rand_in
-        fin_r = fopen('src_modem/input/in_rnd.txt', 'w');
+        fin_r = fopen('src_modem/input/url1.txt', 'w');
 
         symbols = ['a':'z' 'A':'Z' '0':'9'];
         MAX_ST_LENGTH = p.WORD_LEN;

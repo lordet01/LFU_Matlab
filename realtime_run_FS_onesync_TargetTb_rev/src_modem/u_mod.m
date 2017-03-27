@@ -5,9 +5,11 @@ addpath('src_modem/src');
 load('src/BPF_44100_19200-20200.mat');
 
 %load golay code libary from C
-addpath('src_modem/lib');
-if not(libisloaded('golay_lib'))
-    loadlibrary('golay_lib.dll','golay.h')
+if p.BC_GOLAY == 2
+    addpath('src_modem/lib');
+    if not(libisloaded('golay_lib'))
+        loadlibrary('golay_lib.dll','golay.h')
+    end
 end
 %libfunctions('golay_lib')
 
@@ -80,9 +82,36 @@ fbit_bc = fopen(['src_modem/bit/bit_bc_snd.txt'], 'wt');
 % end
 % [b_prev frame_idx]=encode_DPSK(bit_blk_bc, b_prev, frame_idx, fbit_bc, fout, w, Tb, fs, fc, AMP);
 
+%Generate Chirp Sync preamble
+if p.chirp_sync == 1
+    t = -p.t1:1/fs:p.t1;
+    y1 = chirp(t,p.fl,p.t1,p.fh,'quadratic',[],'concave');
+    y2 = chirp(t,p.fl,p.t1,p.fh,'quadratic',[],'concave');
+
+    t_h = floor(length(t) / 2);
+    t_win = floor(t_h*(1-p.rr));
+    w_tail = hann(t_win);
+    w_tail = w_tail .^ p.ws;
+    w_chirp = ones(t_h,1);
+    w_chirp(1:floor(t_win/2)) = w_tail(1:floor(t_win/2));
+    w_chirp(end-floor(t_win/2)+1:end) = w_tail(1+floor(t_win/2):2*floor(t_win/2));
+    y1 = y1(1:t_h) .* w_chirp';
+    y2 = y2(t_h+2:end) .* w_chirp';
+
+    y_sync = [y1 , y2]';  
+end
+
 
 %% Ultrasonic generation. unit block = [header, char. char]
 while (1)
+    if p.chirp_sync == 1
+        if sum(y_sync) ~= 0;
+            fwrite(fout, floor(y_sync(1:p.Tb) .* 32768), 'int16');
+            y_sync = [y_sync(p.Tb+1:end); zeros(p.Tb,1)];
+            continue;
+        end
+    end
+    
     if sync_on < N
         %Add header
         bit_blk(1:2, :) = bit_blk(2:3, :); %blk shift
