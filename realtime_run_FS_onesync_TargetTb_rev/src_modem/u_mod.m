@@ -106,7 +106,7 @@ end
 while (1)
     if p.chirp_sync == 1
         if sum(y_sync) ~= 0;
-            fwrite(fout, floor(y_sync(1:p.Tb) .* 32768), 'int16');
+            fwrite(fout, floor(y_sync(1:p.Tb) .* AMP), 'int16');
             y_sync = [y_sync(p.Tb+1:end); zeros(p.Tb,1)];
             continue;
         end
