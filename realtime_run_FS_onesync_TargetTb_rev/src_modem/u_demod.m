@@ -193,7 +193,6 @@ while (1)
                 AC = AC(1:length(s));
                 AC = AC .^ p.BETA + 0.00001; %Prevent zeros
                 
-                
                 if p.DEBUG
                     if AC_full == 0
                         AC_full = AC;
@@ -208,7 +207,11 @@ while (1)
                 if blk_cnt == p.DRES_blk
                     [peak_pos, mem_DRES] = DRES_detect_blk(AC_blk', mem_DRES, prm_DRES);
                     if peak_pos > 0
+                        %Debug Point!
                         disp(peak_pos);
+                        disp(nFrmIdx);
+                        
+                        plot(s_buff(1:peak_pos-1));
                         sync_flag = 1;
                         s_prv = zeros(1,Tb);
                         s = s_buff(peak_pos:peak_pos+Tb - 1);
@@ -371,9 +374,9 @@ while (1)
         s_sync_tail_prv_1 = AC_tail_1;
     end
     
-    if nFrmIdx <= p.init_frame
+%     if nFrmIdx <= p.init_frame
         nFrmIdx = nFrmIdx + 1;
-    end
+%     end
 end
 fclose('all');
 unloadlibrary('golay_lib');

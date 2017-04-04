@@ -25,10 +25,17 @@ clc;
 addpath('src');
 addpath('src_modem');
 initial_setting;
+SENT_WAV = 'src_modem/snd/vote1_Tb810_Fc19600.wav';
+BGN_WAV = 'channel/noise_218_long.wav';
+CHANNEL_WAV = 'src_modem/snd/vote1_Tb810_Fc19600_channel.wav';
 
+%% Apply acoustic channel to the Tx signal
+[x, fs, bits] = wavread(SENT_WAV);
+d = wavread(BGN_WAV);
+y = acoust_channel(x, d, fs);
+wavwrite(y, fs, bits, CHANNEL_WAV);
 
-%% Decode RX signals ( Apply Tx signal on channel model)
-
+%% Decode RX signals
 snd_path = 'src_modem/snd';
 rcv_path = 'src_modem/rcv_sim_fs1';
 snd_list = dir(snd_path);
@@ -39,7 +46,7 @@ Tb_target = p.Tb;
 for i = 1:length(Tb_target)
     %Decode Rx signal
 %     fname_wav_rcv = 'src_modem/rcv_sim_fs1/URL_out.wav';
-    fname_wav_rcv = 'src_modem/snd/vote1_Tb810_Fc19600_delayed.wav';
+    fname_wav_rcv = CHANNEL_WAV;
     [~,fname_rcv] = strtok(fname_wav_rcv, '/');
     [~,fname_rcv] = strtok(fname_rcv, '/');
     [fname_rcv,~] = strtok(fname_rcv, '/');

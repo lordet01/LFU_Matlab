@@ -24,7 +24,6 @@ s_frame_1d = g.s_frame_1d;
 s_frame_LP_1d = g.s_frame_LP_1d;
 peak_val_1d = g.peak_val_1d;
 dres_bp_1d = g.dres_bp_1d;
-cnt = g.cnt;
 frame_idx = g.frame_idx;
 w = g.w;
 peak_val_sel = g.peak_val_sel;
@@ -66,14 +65,16 @@ peak_val_sel = g.peak_val_sel;
     %% Peak area detection by mean-max thresholding
     max_val = max(dres_bp_mid);
     mean_val = mean(dres_bp_mid);
-    cnt = cnt+1;
     peak_pos = 0; %default output
     
     if max_val > mean_val * MEAN_thr && mean_val > 0.000001
-        [peak_val,peak_pos_cand] = max(dres_bp_1d);
+        [peak_val,~] = max(dres_bp_1d);
         if peak_val_1d > 0.001 && peak_val > peak_val_1d * MEAN_thr && peak_val > peak_val_sel
-            peak_pos = peak_pos_cand;
-            peak_val_sel = peak_val;
+            [~,peak_pos_cand] = max(dres_bp);
+            if peak_pos_cand < SIZE_FRAME
+                peak_pos = peak_pos_cand;
+                peak_val_sel = peak_val;
+            end
         end
         peak_val_1d = peak_val;
     end
@@ -84,8 +85,7 @@ g.s_frame_1d = s_blk;
 g.s_frame_LP_1d = s_frame_LP;
 g.peak_val_1d = peak_val_1d;
 g.dres_bp_1d = dres_bp;
-g.frame_idx = frame_idx;
-g.cnt = cnt;
+g.frame_idx = frame_idx + 1;
 g.peak_val_sel = peak_val_sel;
     
     
